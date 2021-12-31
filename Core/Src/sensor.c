@@ -12,7 +12,7 @@ int SPIWriteSingle(HAMSTRONE_SPI_HANDLE_TYPE *fd, uint8_t regaddr, uint8_t value
     }
 }
 
-int SPIReadSingle(HAMSTRONE_SPI_HANDLE_TYPE *fd, enum spi_mode_e mode, uint8_t regaddr, uint8_t *val)
+int SPIReadSingle(HAMSTRONE_SPI_HANDLE_TYPE *fd, uint8_t regaddr, uint8_t *val)
 {
 
     uint8_t tx[1] = {regaddr};

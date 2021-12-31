@@ -24,9 +24,9 @@ void InitMotor(HAMSTRONE_TIM_HANDLE_TYPE *hdl)
 uint16_t suppress(uint16_t val)
 {
 #define MARGIN 1500
-    if (val < ESC_DUTY_MIN_PERCENTILE + MARGIN)
+    if (val < ESC_DUTY_MIN + MARGIN)
     {
-        return ESC_DUTY_MIN_PERCENTILE + MARGIN;
+        return ESC_DUTY_MIN + MARGIN;
     }
     else if (val > ESC_DUTY_MAX - MARGIN)
     {

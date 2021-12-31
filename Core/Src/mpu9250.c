@@ -46,7 +46,7 @@ int initMPU9250()
     {
         SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, initRegister[i][0], initRegister[i][1]);
         mpudebug("initMPU9250: init reg %d = %d", initRegister[i][0], initRegister[i][1]);
-        usleep(1000);
+        osDelay(10);
     }
 
     // calibrate ak8963
@@ -64,7 +64,7 @@ int initMPU9250()
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_I2C_SLV0_ADDR, AK8963_I2C_ADDR | READ_FLAG); //Set the I2C slave addres of AK8963 and set for read.
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_I2C_SLV0_REG, AK8963_WIA);                   //I2C slave 0 register address from where to begin data transfer
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_I2C_SLV0_CTRL, 0x81);
-    usleep(1000);
+    osDelay(10);
     SPIReadSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_EXT_SENS_DATA_00 | READ_FLAG, &whoami);
     mpudebug("initMPU9250: ak8963 wai=%d", whoami);
     if (whoami != AK8963_WHOAMI_VALUE)
@@ -137,13 +137,13 @@ void calibrateMPU9250(float *dest1, float *dest2)
 
     // reset device
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_PWR_MGMT_1, 0x80); // Write a one to bit 7 reset bit; toggle reset device
-    usleep(1000000);
+    osDelay(1000);
 
     // get stable time source; Auto select clock source to be PLL gyroscope reference if ready
     // else use the internal oscillator, bits 2:0 = 001
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_PWR_MGMT_1, 0x01);
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_PWR_MGMT_2, 0x00);
-    usleep(200000);
+    osDelay(200);
 
     // Configure device for bias calculation
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_INT_ENABLE, 0x00);   // Disable all interrupts
@@ -152,7 +152,7 @@ void calibrateMPU9250(float *dest1, float *dest2)
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_I2C_MST_CTRL, 0x00); // Disable I2C master
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_USER_CTRL, 0x00);    // Disable FIFO and I2C master modes
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_USER_CTRL, 0x0C);    // Reset FIFO and DMP
-    usleep(15000);
+    osDelay(150);
 
     // Configure MPU6050 gyro and accelerometer for bias calculation
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_CONFIG, 0x01);       // Set low-pass filter to 188 Hz
@@ -166,7 +166,7 @@ void calibrateMPU9250(float *dest1, float *dest2)
     // Configure FIFO to capture accelerometer and gyro data for bias calculation
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_USER_CTRL, 0x40); // Enable FIFO
     SPIWriteSingle(HAMSTRONE_GLOBAL_SPI_PORT, MPUREG_FIFO_EN, 0x78);   // Enable gyro and accelerometer sensors for FIFO  (max size 512 bytes in MPU-9150)
-    usleep(40000);                                                                       // accumulate 40 samples in 40 milliseconds = 480 bytes
+    osDelay(400);                                                                       // accumulate 40 samples in 40 milliseconds = 480 bytes
 
     // At end of sample accumulation, turn off FIFO sensor read
     uint8_t datah, datal;

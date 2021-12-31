@@ -16,7 +16,7 @@ extern "C" {
 #include "config.h"
 
 /* CMSIS& HAL header */
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
 #include "stm32l4xx_hal.h"
 
 /* MESSAGE STRUCTURE */
@@ -57,7 +57,7 @@ typedef struct _HAMSTERTONGUE_Message
 } HAMSTERTONGUE_Message;
 
 
-void HAMSTERTONGUE_SetWriteSemaphore(HAMSTERTONGUE_SEMAPHORE_TYPE *sem);
+void HAMSTERTONGUE_SetWriteSemaphore(HAMSTERTONGUE_SEMAPHORE_TYPE sem);
 void HAMSTERTONGUE_SetDefaultFile(HAMSTERTONGUE_HANDLE_TYPE *fd);
 HAMSTERTONGUE_Message *HAMSTERTONGUE_NewMessage(uint8_t verb, uint8_t noun, uint8_t payloadLength);
 HAMSTERTONGUE_Message *HAMSTERTONGUE_NewStringMessage(uint8_t verb, uint8_t noun, char *str);

@@ -1,10 +1,10 @@
 #include "hamster_tongue.h"
 
-HAMSTERTONGUE_SEMAPHORE_TYPE *WriteSemaphore = NULL;
+HAMSTERTONGUE_SEMAPHORE_TYPE WriteSemaphore = NULL;
 HAMSTERTONGUE_HANDLE_TYPE *defaultFd = NULL;
 uint32_t timeout = 100;
 
-void HAMSTERTONGUE_SetWriteSemaphore(HAMSTERTONGUE_SEMAPHORE_TYPE *sem)
+void HAMSTERTONGUE_SetWriteSemaphore(HAMSTERTONGUE_SEMAPHORE_TYPE sem)
 {
 	WriteSemaphore = sem;
 }

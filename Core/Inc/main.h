@@ -34,7 +34,7 @@ extern "C" {
 #include "hamster_tongue.h"
 #include "value_store.h"
 #include "config.h"
-#include "task.h"
+#include "cmsis_os2.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -42,12 +42,13 @@ extern "C" {
 #define HAMSTRONE_I2C_HANDLE_TYPE I2C_HandleTypeDef
 #define HAMSTRONE_SPI_HANDLE_TYPE SPI_HandleTypeDef
 #define HAMSTRONE_TIM_HANDLE_TYPE TIM_HandleTypeDef
+#include "hamstrone_task.h" // this header file refer above 3 macros.
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-extern HAMSTERTONGUE_SEMAPHORE_TYPE *HAMSTRONE_GLOBAL_TELEMETRY_SEMAPHORE;
-extern HAMSTERTONGUE_HANDLE_TYPE *HAMSTRONE_GLOBAL_TELEMETRY_PORT, *HAMSTRONE_GLOBAL_SERIAL_PORT;
+extern osSemaphoreId_t HAMSTRONE_GLOBAL_TELEMETRY_SEMAPHORE;
+extern UART_HandleTypeDef *HAMSTRONE_GLOBAL_TELEMETRY_PORT, *HAMSTRONE_GLOBAL_SERIAL_PORT;
 extern HAMSTRONE_I2C_HANDLE_TYPE *HAMSTRONE_GLOBAL_I2C_PORT;
 extern HAMSTRONE_SPI_HANDLE_TYPE *HAMSTRONE_GLOBAL_SPI_PORT;
 extern HAMSTRONE_TIM_HANDLE_TYPE *HAMSTRONE_GLOBAL_MOTOR_PWM;

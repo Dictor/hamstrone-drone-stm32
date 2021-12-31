@@ -1,4 +1,4 @@
-#include "include/serialize.h"
+#include "serialize.h"
 
 void HAMSTRONE_Serialize32(uint32_t i, uint8_t* buf, int offset) {
 	*(buf + offset) = i & 0xff;

@@ -1,15 +1,15 @@
-#include "task.h"
+#include "hamstrone_task.h"
 
 void tskTransmitValue(void *args)
 {
-    int period  = 100000; //100ms
+    int period  = 100; //100ms
     HAMSTERTONGUE_Message *msg = HAMSTERTONGUE_NewMessage(HAMSTERTONGUE_MESSAGE_VERB_VALUE, 0, sizeof(HAMSTRONE_CONFIG_VALUE_TYPE) * HAMSTRONE_CONFIG_VALUE_SIZE);
 
     while (1)
     {
         HAMSTRONE_Serialize32Array(HAMSTRONE_GetValueStorePointer(), msg->Payload, HAMSTRONE_CONFIG_VALUE_SIZE, 0);
         HAMSTERTONGUE_WriteMessage(HAMSTRONE_GLOBAL_TELEMETRY_PORT, msg);
-        usleep(period);
+        osDelay(period);
     }
 }
 
@@ -17,10 +17,10 @@ void tskTransmitValue(void *args)
 #define TFMINI_COUNT 0
 void tskUpdateValue(void *args)
 {
-    int period = 10000; //10ms
-
-    struct timespec startTs, currentTs, taskendTs;
-    clock_gettime(CLOCK_MONOTONIC, &startTs);
+    int period = 10; //10ms
+    uint32_t startTick, currentTick, taskendTick;
+    uint32_t tickFreq = osKernelGetTickFreq();
+    startTick = osKernelGetTickCount();
 
     mpu9250Data mpudata;
     double angle[3], pidangle[3];
@@ -54,8 +54,8 @@ void tskUpdateValue(void *args)
     while (1)
     {
         /* update runtime */
-        clock_gettime(CLOCK_MONOTONIC, &currentTs);
-        HAMSTRONE_WriteValueStore(0, (uint32_t)(currentTs.tv_sec - startTs.tv_sec));
+    	currentTick = osKernelGetTickCount();
+        HAMSTRONE_WriteValueStore(0, (uint32_t)((currentTick - startTick) / tickFreq));
 
         /* update so6203 sensor value */
         if (readSO6203(0, SO6203_COUNT, bright) < 0)
@@ -116,15 +116,15 @@ void tskUpdateValue(void *args)
         motor[2] = 2 * (-pidangle[0] + pidangle[1]) + 100;
         motor[3] = 2 * (-pidangle[0] - pidangle[1]) + 100;
 
-        PWMWriteAll(HAMSTRONE_GLOBAL_MOTOR_PWM_INFO, motor[0], motor[1], motor[2], motor[3]);
+        PWMWriteAll(HAMSTRONE_GLOBAL_MOTOR_PWM, motor[0], motor[1], motor[2], motor[3]);
         HAMSTRONE_WriteValueStore(6, (uint32_t)motor[0]);
         HAMSTRONE_WriteValueStore(7, (uint32_t)motor[1]);
         HAMSTRONE_WriteValueStore(8, (uint32_t)motor[2]);
         HAMSTRONE_WriteValueStore(9, (uint32_t)motor[3]);
 
-        usleep(period);
-        clock_gettime(CLOCK_MONOTONIC, &taskendTs);
+        osDelay(period);
+        taskendTick = osKernelGetTickCount();
         // PROPERY TICK RESOULUTION IS SMALLER THAN 1000USEC
-        HAMSTRONE_WriteValueStore(1, (uint32_t)((taskendTs.tv_nsec - currentTs.tv_nsec) / 1000000));
+        HAMSTRONE_WriteValueStore(1, (uint32_t)(tickFreq / (taskendTick - currentTick)));
     }
 }
