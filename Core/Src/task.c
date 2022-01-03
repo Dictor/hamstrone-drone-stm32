@@ -26,6 +26,8 @@ void tskUpdateValue(void *args)
     double angle[3], pidangle[3];
     uint16_t motor[4] = {0, 0, 0, 0};
     uint16_t bright[SO6203_COUNT], dist[TFMINI_COUNT];
+    uint8_t qNetInput[7] = {0,};
+    float qNetResult;
 
     /* initialize SO6203 */
     if (initSO6203(0, 0 + SO6203_COUNT) < 0)
@@ -121,6 +123,9 @@ void tskUpdateValue(void *args)
         HAMSTRONE_WriteValueStore(7, (uint32_t)motor[1]);
         HAMSTRONE_WriteValueStore(8, (uint32_t)motor[2]);
         HAMSTRONE_WriteValueStore(9, (uint32_t)motor[3]);
+
+        /* interence */
+        inferenceModel(qNetInput, 8, &qNetResult);
 
         osDelay(period);
         taskendTick = osKernelGetTickCount();

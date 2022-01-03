@@ -132,6 +132,7 @@ int main(void)
   HAMSTRONE_GLOBAL_I2C_PORT = &hi2c3;
   HAMSTRONE_GLOBAL_SPI_PORT = &hspi1;
   HAMSTRONE_GLOBAL_MOTOR_PWM = &htim1;
+  initTF();
   /* USER CODE END 2 */
 
   /* Init scheduler */

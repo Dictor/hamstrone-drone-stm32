@@ -43,6 +43,7 @@ extern "C" {
 #define HAMSTRONE_SPI_HANDLE_TYPE SPI_HandleTypeDef
 #define HAMSTRONE_TIM_HANDLE_TYPE TIM_HandleTypeDef
 #include "hamstrone_task.h" // this header file refer above 3 macros.
+#include "tfmicro.h"
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
