@@ -138,8 +138,10 @@ ssize_t HAMSTERTONGUE_WriteMessage(HAMSTERTONGUE_HANDLE_TYPE *fd, HAMSTERTONGUE_
 	uint8_t *serialMsg = HAMSTERTONGUE_SerializeMessage(msg);
 	if (WriteSemaphore != NULL)
 	{
-		if (osSemaphoreAcquire(WriteSemaphore, timeout) != osOK)
+		if (osSemaphoreAcquire(WriteSemaphore, timeout) != osOK) {
+			free(serialMsg);
 			return -1;
+		}
 	}
 	int ret;
 	if (HAL_UART_Transmit(fd, serialMsg, HAMSTERTONGUE_GetMessageLength(msg), 50) != HAL_OK) {
