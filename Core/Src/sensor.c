@@ -1,11 +1,24 @@
 #include "sensor.h"
 
-#define TIMEOUT 100
+#define TIMEOUT 1
+
+void spiSelect() {
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+}
+
+void spiDeSelect() {
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
+}
 
 int SPIWriteSingle(HAMSTRONE_SPI_HANDLE_TYPE *fd, uint8_t regaddr, uint8_t value)
 {
     uint8_t tx[2] = {regaddr, value};
-    if (HAL_SPI_Transmit(fd, tx, 2, TIMEOUT) != HAL_OK) {
+
+    spiSelect();
+    HAL_StatusTypeDef ret = HAL_SPI_Transmit(fd, tx, 2, TIMEOUT);
+    spiDeSelect();
+
+    if (ret != HAL_OK) {
     	return -1;
     } else {
     	return 0;
@@ -15,10 +28,13 @@ int SPIWriteSingle(HAMSTRONE_SPI_HANDLE_TYPE *fd, uint8_t regaddr, uint8_t value
 int SPIReadSingle(HAMSTRONE_SPI_HANDLE_TYPE *fd, uint8_t regaddr, uint8_t *val)
 {
 
-    uint8_t tx[1] = {regaddr};
-    uint8_t rx[1] = {0};
+    uint8_t tx[2] = {regaddr, 0};
+    uint8_t rx[2] = {0,};
 
-    HAL_StatusTypeDef ret = HAL_SPI_TransmitReceive(fd, tx, rx, 1, TIMEOUT);
+    spiSelect();
+    HAL_StatusTypeDef ret = HAL_SPI_TransmitReceive(fd, tx, rx, 2, TIMEOUT);
+    spiDeSelect();
+    //HAMSTERTONGUE_Debugf("SPIReadSingle ret = %d", ret);
     *val = rx[1];
     if (ret != HAL_OK) {
     	return -1;
@@ -32,8 +48,19 @@ int SPIRead(HAMSTRONE_SPI_HANDLE_TYPE *fd, uint8_t regaddr, uint8_t recieveBytes
     uint8_t tx[1] = {regaddr};
     uint8_t *rx = malloc(recieveBytes);
     memset(rx, 0, recieveBytes);
-    if (HAL_SPI_Transmit(fd, tx, 1, TIMEOUT) != HAL_OK) return -1;
-    if (HAL_SPI_Receive(fd, rx, recieveBytes, TIMEOUT) != HAL_OK) return -1;
+    HAL_StatusTypeDef ret;
+
+    spiSelect();
+    ret = HAL_SPI_Transmit(fd, tx, 1, TIMEOUT);
+    if (ret != HAL_OK) {
+    	spiDeSelect();
+    	return -1;
+    }
+    ret = HAL_SPI_Receive(fd, rx, recieveBytes, TIMEOUT);
+    spiDeSelect();
+
+    //HAMSTERTONGUE_Debugf("SPIRead ret = %d", ret);
+    if (ret != HAL_OK) return -1;
     memcpy(val, rx, sizeof(uint8_t) * recieveBytes);
     free(rx);
     return 0;

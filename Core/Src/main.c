@@ -127,12 +127,13 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAMSTRONE_InitValueStore(HAMSTRONE_CONFIG_VALUE_SIZE);
-  HAMSTRONE_GLOBAL_TELEMETRY_PORT = &huart1;
-  HAMSTRONE_GLOBAL_SERIAL_PORT = &huart2;
+  HAMSTRONE_GLOBAL_TELEMETRY_PORT = &huart2;
+  HAMSTRONE_GLOBAL_SERIAL_PORT = &huart1;
   HAMSTRONE_GLOBAL_I2C_PORT = &hi2c3;
   HAMSTRONE_GLOBAL_SPI_PORT = &hspi1;
   HAMSTRONE_GLOBAL_MOTOR_PWM = &htim1;
-  initTF();
+  HAMSTERTONGUE_SetDefaultFile(HAMSTRONE_GLOBAL_TELEMETRY_PORT);
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -144,8 +145,8 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   HAMSTRONE_GLOBAL_TELEMETRY_SEMAPHORE = osSemaphoreNew(1U, 1U, NULL);
-  if (HAMSTRONE_GLOBAL_TELEMETRY_SEMAPHORE == NULL) {
-
+  if (HAMSTRONE_GLOBAL_TELEMETRY_SEMAPHORE != NULL) {
+	  HAMSTERTONGUE_SetWriteSemaphore(HAMSTRONE_GLOBAL_TELEMETRY_SEMAPHORE);
   }
   /* USER CODE END RTOS_SEMAPHORES */
 
@@ -159,20 +160,26 @@ int main(void)
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  //defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   const osThreadAttr_t tskTransmitValueAttr = {
-	.name = "tskTransmitValue",
-    .stack_size = 2048
+    .stack_size = 1024,
+	.priority = osPriorityHigh
+
   };
   osThreadNew(tskTransmitValue, NULL, &tskTransmitValueAttr);
 
   const osThreadAttr_t tskUpdateValueAttr = {
-  	.name = "tskUpdateValue",
-    .stack_size = 2048
+    .stack_size = 1024,
+	.priority = osPriorityRealtime
   };
   osThreadNew(tskUpdateValue, NULL, &tskUpdateValueAttr);
+
+  const osThreadAttr_t tskInferenceAttr = {
+    .stack_size = 2048
+  };
+  //osThreadNew(tskInference, NULL, &tskInferenceAttr);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -223,7 +230,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 16;
+  RCC_OscInitStruct.PLL.PLLN = 40;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -240,7 +247,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -362,7 +369,7 @@ static void MX_I2C3_Init(void)
 
   /* USER CODE END I2C3_Init 1 */
   hi2c3.Instance = I2C3;
-  hi2c3.Init.Timing = 0x00707CBB;
+  hi2c3.Init.Timing = 0x10909CEC;
   hi2c3.Init.OwnAddress1 = 0;
   hi2c3.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c3.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -411,17 +418,17 @@ static void MX_SPI1_Init(void)
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_4BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
   hspi1.Init.CRCPolynomial = 7;
   hspi1.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
-  hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+  hspi1.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
   if (HAL_SPI_Init(&hspi1) != HAL_OK)
   {
     Error_Handler();
@@ -453,7 +460,7 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 10-1;
+  htim1.Init.Prescaler = 1000-1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim1.Init.Period = 160-1;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -611,12 +618,22 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
+
   /*Configure GPIO pin : LD3_Pin */
   GPIO_InitStruct.Pin = LD3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD3_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
