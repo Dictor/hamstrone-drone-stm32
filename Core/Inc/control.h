@@ -7,7 +7,7 @@
 
 #include "mpu9250.h"
 #define PID_DIMENSION 2
-#define TIMEDELTA 0.01
+#define TIMEDELTA 0.004
 
 typedef struct _Kalman_t
 {

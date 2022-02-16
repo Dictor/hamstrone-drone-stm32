@@ -1,11 +1,10 @@
 #include "pwm.h"
 
 // duty is uint16_t, 0~65535
-#define DUTY_TO_VALUE(d) (uint16_t)(d / 65535.0) * PWM_PERIOD;
+#define DUTY_TO_VALUE(d) (uint16_t)((float)(d / 65535.0) * PWM_PERIOD)
 
 void InitMotor(HAMSTRONE_TIM_HANDLE_TYPE *hdl)
 {
-	HAL_TIM_PWM_Init(hdl);
 	HAL_TIM_PWM_Start(hdl, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(hdl, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(hdl, TIM_CHANNEL_3);
@@ -40,10 +39,12 @@ uint16_t suppress(uint16_t val)
 
 void PWMWriteAll(HAMSTRONE_TIM_HANDLE_TYPE *hdl, uint16_t perc1, uint16_t perc2, uint16_t perc3, uint16_t perc4)
 {
+
 	hdl->Instance->CCR1 = DUTY_TO_VALUE(suppress(ESC_DUTY_MIN + perc1 * ESC_DUTY_PERCENTILE_STEP));
 	hdl->Instance->CCR2 = DUTY_TO_VALUE(suppress(ESC_DUTY_MIN + perc2 * ESC_DUTY_PERCENTILE_STEP));
 	hdl->Instance->CCR3 = DUTY_TO_VALUE(suppress(ESC_DUTY_MIN + perc3 * ESC_DUTY_PERCENTILE_STEP));
 	hdl->Instance->CCR4 = DUTY_TO_VALUE(suppress(ESC_DUTY_MIN + perc4 * ESC_DUTY_PERCENTILE_STEP));
+
 }
 
 /*
