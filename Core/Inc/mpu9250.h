@@ -26,8 +26,8 @@ typedef struct _mpu9250Data
 #define AK8963_WHOAMI_VALUE 0x48
 #define ERROR_INVALID_WHOAMI -1
 
-//#define ENABLE_DEBUG_MESSAGE
-#ifdef ENABLE_DEBUG_MESSAGE
+//#define ENABLE_MPU_DEBUG_MESSAGE
+#ifdef ENABLE_MPU_DEBUG_MESSAGE
 #define mpudebug(...) HAMSTERTONGUE_Debugf(__VA_ARGS__)
 #else
 #define mpudebug(...)

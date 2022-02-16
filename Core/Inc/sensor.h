@@ -10,6 +10,7 @@
 //#include "hamster_tongue.h"
 #include "config.h"
 #include "serialize.h"
+#include "cmsis_os2.h"
 
 int SPIReadSingle(HAMSTRONE_SPI_HANDLE_TYPE *fd, uint8_t regaddr, uint8_t *buf);
 int SPIRead(HAMSTRONE_SPI_HANDLE_TYPE *fd, uint8_t regaddr, uint8_t recieveBytes, uint8_t *val);
