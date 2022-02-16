@@ -17,17 +17,26 @@ void tskTransmitValue(void *args)
 #define TFMINI_COUNT 0
 void tskUpdateValue(void *args)
 {
-    int period = 10; //10ms
+    int period = 4; //4ms
     uint32_t startTick, currentTick, taskendTick;
     uint32_t tickFreq = osKernelGetTickFreq();
     startTick = osKernelGetTickCount();
+    HAMSTERTONGUE_Debugf("start tick : %d", startTick);
 
     mpu9250Data mpudata;
     double angle[3], pidangle[3];
     uint16_t motor[4] = {0, 0, 0, 0};
     uint16_t bright[SO6203_COUNT], dist[TFMINI_COUNT];
-    uint8_t qNetInput[7] = {0,};
-    float qNetResult;
+
+    if (initTF() < 0) {
+    	HAMSTERTONGUE_WriteAndFreeMessage(
+    	            HAMSTRONE_GLOBAL_TELEMETRY_PORT,
+    	            HAMSTERTONGUE_NewFormatStringMessage(
+    	                HAMSTERTONGUE_MESSAGE_VERB_SIGNAL,
+    	                HAMSTERTONGUE_MESSAGE_NOUN_SIGNAL_SENSORINITFAIL,
+    	                32,
+    	                "init tensorflow"));
+    }
 
     /* initialize SO6203 */
     if (initSO6203(0, 0 + SO6203_COUNT) < 0)
@@ -53,6 +62,8 @@ void tskUpdateValue(void *args)
         return;
     }
 
+    InitMotor(HAMSTRONE_GLOBAL_MOTOR_PWM);
+
     while (1)
     {
         /* update runtime */
@@ -60,6 +71,7 @@ void tskUpdateValue(void *args)
         HAMSTRONE_WriteValueStore(0, (uint32_t)((currentTick - startTick) / tickFreq));
 
         /* update so6203 sensor value */
+        /*
         if (readSO6203(0, SO6203_COUNT, bright) < 0)
         {
             HAMSTERTONGUE_WriteAndFreeMessage(
@@ -74,8 +86,9 @@ void tskUpdateValue(void *args)
         {
             HAMSTRONE_WriteValueStore(10 + i, (uint32_t)bright[i]);
         }
-
+*/
         /* update tfmini sensor value */
+        /*
         if (readSO6203(0, TFMINI_COUNT, dist) < 0)
         {
             HAMSTERTONGUE_WriteAndFreeMessage(
@@ -90,6 +103,7 @@ void tskUpdateValue(void *args)
         {
             HAMSTRONE_WriteValueStore(10 + TFMINI_COUNT + i, (uint32_t)dist[i]);
         }
+*/
 
         /* update mpu9250 sensor value */
         if (readMPU9250(&mpudata) < 0)
@@ -124,12 +138,31 @@ void tskUpdateValue(void *args)
         HAMSTRONE_WriteValueStore(8, (uint32_t)motor[2]);
         HAMSTRONE_WriteValueStore(9, (uint32_t)motor[3]);
 
-        /* interence */
-        inferenceModel(qNetInput, 8, &qNetResult);
-
         osDelay(period);
         taskendTick = osKernelGetTickCount();
+
         // PROPERY TICK RESOULUTION IS SMALLER THAN 1000USEC
-        HAMSTRONE_WriteValueStore(1, (uint32_t)(tickFreq / (taskendTick - currentTick)));
+        HAMSTRONE_WriteValueStore(1, (uint32_t)(((float)(taskendTick - currentTick) / (float)tickFreq) * 1000));
     }
+}
+
+void tskInference(void *args)
+{
+    uint8_t qNetInput[7] = {0,};
+    float qNetResult;
+	int period = 3000;
+	while(1) {
+	    /* interence */
+	    if (inferenceModel(qNetInput, 8, &qNetResult) < 0) {
+	    	HAMSTERTONGUE_WriteAndFreeMessage(
+	    	                HAMSTRONE_GLOBAL_TELEMETRY_PORT,
+	    	                HAMSTERTONGUE_NewFormatStringMessage(
+	    	                    HAMSTERTONGUE_MESSAGE_VERB_SIGNAL,
+	    	                    HAMSTERTONGUE_MESSAGE_NOUN_SIGNAL_SENSORREADFAIL,
+	    	                    24,
+	    	                    "inference model"));
+	    }
+	    HAMSTRONE_WriteValueStore(15, (uint32_t)qNetResult);
+	    osDelay(period);
+	}
 }

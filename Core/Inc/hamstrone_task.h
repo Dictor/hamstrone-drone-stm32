@@ -23,9 +23,11 @@
 #include "control.h"
 #include "bright_dist_sensor.h"
 #include "tfmicro.h"
+#include "pwm.h"
 
 void tskTransmitValue(void *args);
 void tskUpdateValue(void *args);
+void tskInference(void *args);
 
 #ifdef __cplusplus
 }
