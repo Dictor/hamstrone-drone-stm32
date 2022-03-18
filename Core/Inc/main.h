@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.h
+ * @brief          : Header for main.c file.
+ *                   This file contains the common defines of the application.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2021 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -23,7 +23,8 @@
 #define __MAIN_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -43,33 +44,32 @@ extern "C" {
 #define HAMSTRONE_SPI_HANDLE_TYPE SPI_HandleTypeDef
 #define HAMSTRONE_TIM_HANDLE_TYPE TIM_HandleTypeDef
 #include "hamstrone_task.h" // this header file refer above 3 macros.
-#include "tfmicro.h"
-/* USER CODE END ET */
+  /* USER CODE END ET */
 
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
-extern osSemaphoreId_t HAMSTRONE_GLOBAL_TELEMETRY_SEMAPHORE;
-extern UART_HandleTypeDef *HAMSTRONE_GLOBAL_TELEMETRY_PORT, *HAMSTRONE_GLOBAL_SERIAL_PORT;
-extern HAMSTRONE_I2C_HANDLE_TYPE *HAMSTRONE_GLOBAL_I2C_PORT;
-extern HAMSTRONE_SPI_HANDLE_TYPE *HAMSTRONE_GLOBAL_SPI_PORT;
-extern HAMSTRONE_TIM_HANDLE_TYPE *HAMSTRONE_GLOBAL_MOTOR_PWM;
+  /* Exported constants --------------------------------------------------------*/
+  /* USER CODE BEGIN EC */
+  extern osSemaphoreId_t HAMSTRONE_GLOBAL_TELEMETRY_SEMAPHORE;
+  extern UART_HandleTypeDef *HAMSTRONE_GLOBAL_TELEMETRY_PORT, *HAMSTRONE_GLOBAL_SERIAL_PORT;
+  extern HAMSTRONE_I2C_HANDLE_TYPE *HAMSTRONE_GLOBAL_I2C_PORT;
+  extern HAMSTRONE_SPI_HANDLE_TYPE *HAMSTRONE_GLOBAL_SPI_PORT;
+  extern HAMSTRONE_TIM_HANDLE_TYPE *HAMSTRONE_GLOBAL_MOTOR_PWM;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-#define HAMSTERTONGUE_InitFailf(...)                    \
-    HAMSTERTONGUE_WriteAndFreeMessage(                  \
-        HAMSTRONE_GLOBAL_TELEMETRY_PORT,                \
-        HAMSTERTONGUE_NewFormatStringMessage(           \
-            HAMSTERTONGUE_MESSAGE_VERB_SIGNAL,          \
-            HAMSTERTONGUE_MESSAGE_NOUN_SIGNAL_INITFAIL, \
-            48, __VA_ARGS__));
-/* USER CODE END EM */
+#define HAMSTERTONGUE_InitFailf(...)                  \
+  HAMSTERTONGUE_WriteAndFreeMessage(                  \
+      HAMSTRONE_GLOBAL_TELEMETRY_PORT,                \
+      HAMSTERTONGUE_NewFormatStringMessage(           \
+          HAMSTERTONGUE_MESSAGE_VERB_SIGNAL,          \
+          HAMSTERTONGUE_MESSAGE_NOUN_SIGNAL_INITFAIL, \
+          48, __VA_ARGS__));
+  /* USER CODE END EM */
 
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+  void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
-/* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+  /* Exported functions prototypes ---------------------------------------------*/
+  void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
@@ -86,10 +86,9 @@ void Error_Handler(void);
 #define SWCLK_GPIO_Port GPIOA
 #define LD3_Pin GPIO_PIN_3
 #define LD3_GPIO_Port GPIOB
-/* USER CODE BEGIN Private defines */
+  /* USER CODE BEGIN Private defines */
 
-
-/* USER CODE END Private defines */
+  /* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

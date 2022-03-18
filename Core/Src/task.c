@@ -28,16 +28,6 @@ void tskUpdateValue(void *args)
     uint16_t motor[4] = {0, 0, 0, 0};
     uint16_t bright[SO6203_COUNT], dist[TFMINI_COUNT];
 
-    if (initTF() < 0) {
-    	HAMSTERTONGUE_WriteAndFreeMessage(
-    	            HAMSTRONE_GLOBAL_TELEMETRY_PORT,
-    	            HAMSTERTONGUE_NewFormatStringMessage(
-    	                HAMSTERTONGUE_MESSAGE_VERB_SIGNAL,
-    	                HAMSTERTONGUE_MESSAGE_NOUN_SIGNAL_SENSORINITFAIL,
-    	                32,
-    	                "init tensorflow"));
-    }
-
     /* initialize SO6203 */
     if (initSO6203(0, 0 + SO6203_COUNT) < 0)
     {
@@ -144,25 +134,4 @@ void tskUpdateValue(void *args)
         // PROPERY TICK RESOULUTION IS SMALLER THAN 1000USEC
         HAMSTRONE_WriteValueStore(1, (uint32_t)(((float)(taskendTick - currentTick) / (float)tickFreq) * 1000));
     }
-}
-
-void tskInference(void *args)
-{
-    uint8_t qNetInput[7] = {0,};
-    float qNetResult;
-	int period = 3000;
-	while(1) {
-	    /* interence */
-	    if (inferenceModel(qNetInput, 8, &qNetResult) < 0) {
-	    	HAMSTERTONGUE_WriteAndFreeMessage(
-	    	                HAMSTRONE_GLOBAL_TELEMETRY_PORT,
-	    	                HAMSTERTONGUE_NewFormatStringMessage(
-	    	                    HAMSTERTONGUE_MESSAGE_VERB_SIGNAL,
-	    	                    HAMSTERTONGUE_MESSAGE_NOUN_SIGNAL_SENSORREADFAIL,
-	    	                    24,
-	    	                    "inference model"));
-	    }
-	    HAMSTRONE_WriteValueStore(15, (uint32_t)qNetResult);
-	    osDelay(period);
-	}
 }
