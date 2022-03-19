@@ -23,8 +23,7 @@
 #define __MAIN_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -44,10 +43,10 @@ extern "C"
 #define HAMSTRONE_SPI_HANDLE_TYPE SPI_HandleTypeDef
 #define HAMSTRONE_TIM_HANDLE_TYPE TIM_HandleTypeDef
 #include "hamstrone_task.h" // this header file refer above 3 macros.
-  /* USER CODE END ET */
+/* USER CODE END ET */
 
-  /* Exported constants --------------------------------------------------------*/
-  /* USER CODE BEGIN EC */
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
   extern osSemaphoreId_t HAMSTRONE_GLOBAL_TELEMETRY_SEMAPHORE;
   extern UART_HandleTypeDef *HAMSTRONE_GLOBAL_TELEMETRY_PORT, *HAMSTRONE_GLOBAL_SERIAL_PORT;
   extern HAMSTRONE_I2C_HANDLE_TYPE *HAMSTRONE_GLOBAL_I2C_PORT;
@@ -64,12 +63,12 @@ extern "C"
           HAMSTERTONGUE_MESSAGE_VERB_SIGNAL,          \
           HAMSTERTONGUE_MESSAGE_NOUN_SIGNAL_INITFAIL, \
           48, __VA_ARGS__));
-  /* USER CODE END EM */
+/* USER CODE END EM */
 
-  void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
-  /* Exported functions prototypes ---------------------------------------------*/
-  void Error_Handler(void);
+/* Exported functions prototypes ---------------------------------------------*/
+void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
@@ -86,9 +85,9 @@ extern "C"
 #define SWCLK_GPIO_Port GPIOA
 #define LD3_Pin GPIO_PIN_3
 #define LD3_GPIO_Port GPIOB
-  /* USER CODE BEGIN Private defines */
+/* USER CODE BEGIN Private defines */
 
-  /* USER CODE END Private defines */
+/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }
